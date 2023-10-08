@@ -1,0 +1,24 @@
+# syntax=docker/dockerfile:1
+
+##########
+# Project's image, for local development only.
+FROM golang:1.21-alpine
+
+RUN apk update && \
+    apk upgrade && \
+    apk add --no-cache git \
+    --repository=https://dl-cdn.alpinelinux.org/alpine/latest-stable/main && \
+    rm -rf /var/cache/apk/*
+
+WORKDIR /app
+
+COPY . /app
+
+ENV GOPROXY https://proxy.golang.org
+
+RUN go install github.com/cespare/reflex@latest
+COPY reflex.conf /
+
+EXPOSE 8080
+
+ENTRYPOINT ["reflex", "-c", "/reflex.conf"]
