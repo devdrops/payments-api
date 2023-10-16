@@ -1,0 +1,7 @@
+# syntax=docker/dockerfile:1
+
+##########
+# Project's database, for local development only.
+FROM postgres:9.6
+# Initialize database schema
+COPY ./db/up.sql /docker-entrypoint-initdb.d/

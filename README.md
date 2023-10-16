@@ -20,15 +20,12 @@ This project uses:
 
 - [Go](https://go.dev/) as the coding language.
 - [PostgreSQL](https://www.postgresql.org/) as the database.
-- [pgAdmin](https://www.pgadmin.org/) as the database GUI (optional).
 
 ```mermaid
 flowchart LR
     api[Go app\nHTTP API]
     db[(PostgreSQL\ndatabase)]
-    api <-...-> db
-    dbgui[pgAdmin\nGUI]
-    db -...- dbgui
+    api <-... Write/Read Operations ...-> db
 ```
 
 The expected inputs for the application should come as HTTP requests, for each specific resource/endpoint:
@@ -94,16 +91,23 @@ In order to use this environment, first make sure you have the tools below corre
 not) work using other versions/OSs.
 \*\*: required to clone this repository :wink:
 
-**Also important**: the local environment will try to use ports **8080** (API), **5432** (database) and **5050**
-(database GUI). Before start, check if these ports are available. If not, you can select other ports by changing them in
-the [docker-compose.yml](./docker-compose.yml) file.
+**Also important**: the local environment will try to use ports **8080** (API) and **5432** (database). Before start,
+check if these ports are available. If not, you can select other ports by changing them in the
+[docker-compose.yml](./docker-compose.yml) file.
 
 ### How to Run
 
 Once you're OK with the steps on [**Prerequisites**](#prerequisites), you can follow the actions below:
 
 1. Using your terminal, navigate to this project's root folder.
-2. In the same terminal window, run the command below:
+2. In the same terminal windown, copy the file [`env/.env.sample`](./env/.env.sample) to `env/.env`. You can run the
+command below in your terminal:
+
+```shell
+cp env/.env.sample env/.env
+```
+
+3. Also in the same terminal window, run the command below:
 
 ```shell
 make start
@@ -115,7 +119,6 @@ This command will:
 2. Start the database server.
 3. Create the application's database.
 4. Start the application at [0.0.0.0:8080](http://0.0.0.0:8080).
-5. Start the database GUI at [0.0.0.0:5050](http://0.0.0.0:5050).
 
 ### How to Stop
 
@@ -126,8 +129,6 @@ This command will:
 make stop
 ```
 
-Then wait a few seconds until all images are stopped.
-
 ### How to Run Tests
 
 1. Using your terminal, navigate to this project's root folder.
@@ -136,4 +137,3 @@ Then wait a few seconds until all images are stopped.
 ```shell
 make tests
 ```
-

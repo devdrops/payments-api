@@ -1,7 +1,6 @@
 version: '3.7'
 
 services:
-    # API
     api:
         # Purpose: application's local environment
         container_name: api
@@ -10,7 +9,7 @@ services:
             dockerfile: Dockerfile.dev
         volumes:
             - .:/app
-            - ./env/go:/go/pkg/mod/cache # Local cache for dependencies
+            - ./env/go:/go/pkg/mod/cache
         ports:
             - 8080:8080
         depends_on:
@@ -18,35 +17,23 @@ services:
         working_dir: /app
         env_file: ./env/.env
         networks:
-          - main
-            #command: go run cmd/main.go
-    # Database
+            - payments
     db:
         # Purpose: application's database.
         container_name: db
-        image: postgres:9.6
+        restart: always
+        build:
+            context: ./env
+            dockerfile: Dockerfile.db.dev
         volumes:
-            - ./env/db/data:/var/lib/postgresql
+            - ./env/db/data:/var/lib/postgresql/data
         ports:
             - 5432:5432
         env_file: ./env/.env
         networks:
-          - main
-    # Database GUI
-    db_gui:
-        # Purpose: GUI database for database.
-        # Available at http://0.0.0.0:5050
-        container_name: db_gui
-        image: fenglc/pgadmin4:1.1
-        volumes:
-            - ./env/db/pgadmin4:/root/.pgadmin
-        ports:
-            - 5050:5050
-        env_file: ./env/.env
-        networks:
-          - main
+            - payments
 
 networks:
     # Purpose: communication between application and database.
-    main:
+    payments:
         driver: bridge

@@ -1,2 +1,3 @@
 .env
-env/db/pgadmin4
+env/db/data
+env/go
