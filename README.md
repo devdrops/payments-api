@@ -70,6 +70,9 @@ Some notes about what I'd thought would be nice to the project.
 
 - In the [extras](./extras) folder, you can find 2 files to use with [Postman](https://www.postman.com/): a Collection
 and an Environment.
+- I've noticed several flaws in the choice of how to work with databases: breaking interface/abstraction rules, usage of
+transactions/commits/rollbacks, etc. In a next scenario, it will be a better choice to use something that already exists
+instead of trying to reinvent the wheel :wink:
 
 ## Execution
 

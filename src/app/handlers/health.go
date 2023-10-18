@@ -10,6 +10,7 @@ import (
 	"payments-api/internal/logger"
 )
 
+// TODO: add these values to the body response
 var (
 	Version   string
 	BuildDate string
