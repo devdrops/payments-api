@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"time"
 
@@ -19,10 +20,15 @@ func HealthCheck(u *database.Utils, log *logger.Logger) http.HandlerFunc {
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 		defer cancel()
 
-		_, err := u.PingDatabase(ctx)
+		ok, err := u.PingDatabase(ctx)
 		if err != nil {
 			log.Error(err)
 			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if !ok {
+			log.Error(errors.New("Database connection unavailable"))
+			w.WriteHeader(http.StatusServiceUnavailable)
 			return
 		}
 

@@ -5,8 +5,8 @@ import (
 
 	"payments-api/internal/config"
 	"payments-api/internal/database"
-	"payments-api/internal/logger"
 	"payments-api/internal/database/postgres"
+	"payments-api/internal/logger"
 	"payments-api/src/domain/account"
 	"payments-api/src/domain/transaction"
 	apphttp "payments-api/src/http"
