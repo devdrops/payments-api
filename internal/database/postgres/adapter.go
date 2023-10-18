@@ -47,7 +47,7 @@ func (adp *PostgresAdapter) Insert(ctx context.Context, table string, columns []
 	}
 	defer stmt.Close()
 
-	if _, err := stmt.ExecContext(ctx, values); err != nil {
+	if _, err := stmt.ExecContext(ctx, values...); err != nil {
 		return err
 	}
 
@@ -55,7 +55,7 @@ func (adp *PostgresAdapter) Insert(ctx context.Context, table string, columns []
 }
 
 func (adp *PostgresAdapter) GetOne(ctx context.Context, table string, columns []string, filters []string, ent database.Entity) (database.Entity, error) {
-	raw := "SELECT %s FROM %s"
+	raw := "SELECT %s FROM %s "
 	instruction := fmt.Sprintf(raw, strings.Join(columns, ", "), table)
 	if len(filters) > 0 {
 		instruction += strings.Join(filters, " ")
