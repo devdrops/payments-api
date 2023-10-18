@@ -63,6 +63,7 @@ BEGIN;
         account_id   INTEGER        NOT NULL,
         operation_id INTEGER        NOT NULL,
         amount       NUMERIC(15, 4) NOT NULL,
+        balance      NUMERIC(15, 4) NOT NULL DEFAULT 0,
         created_at   TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
         CONSTRAINT fk_accounts
             FOREIGN KEY (account_id) REFERENCES accounts(id),

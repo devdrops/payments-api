@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"payments-api/internal/config"
-	"payments-api/internal/database"
 
 	_ "github.com/lib/pq"
 )
@@ -54,7 +53,7 @@ func (adp *PostgresAdapter) Insert(ctx context.Context, table string, columns []
 	return nil
 }
 
-func (adp *PostgresAdapter) GetOne(ctx context.Context, table string, columns []string, filters []string, ent database.Entity) (database.Entity, error) {
+func (adp *PostgresAdapter) GetOne(ctx context.Context, table string, columns []string, filters []string) *sql.Row {
 	raw := "SELECT %s FROM %s "
 	instruction := fmt.Sprintf(raw, strings.Join(columns, ", "), table)
 	if len(filters) > 0 {
@@ -62,20 +61,7 @@ func (adp *PostgresAdapter) GetOne(ctx context.Context, table string, columns []
 	}
 	instruction += ";"
 
-	stmt, err := adp.conn.PrepareContext(ctx, instruction)
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
-
-	res, err := stmt.ExecContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	fmt.Printf("\n\nAAAAAAAAAAAAAAAAAAAAAAA %#v\n\n", res)
-
-	return nil, nil
+	return adp.conn.QueryRowContext(ctx, instruction)
 }
 
 func (adp *PostgresAdapter) Ping(ctx context.Context) (bool, error) {

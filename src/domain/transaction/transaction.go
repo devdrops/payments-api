@@ -19,6 +19,7 @@ type Transaction struct {
 	AccountId   int       `json:"account_id"`
 	OperationId Operation `json:"operation_id"`
 	Amount      float32   `json:"amount"`
+	Balance     float32   `json:"-"`
 	CreatedAt   time.Time `json:"-"`
 }
 
@@ -49,5 +50,5 @@ func (trx *Transaction) Valid() bool {
 }
 
 func (trx *Transaction) String() string {
-	return fmt.Sprintf("Transaction [ Id: %d, Account Id: %d, Operation Id: %d, Amount: %f.2, Created At: %v ]", trx.Id, trx.AccountId, trx.OperationId, trx.Amount, trx.CreatedAt)
+	return fmt.Sprintf("Transaction [ Id: %d, Account Id: %d, Operation Id: %d, Amount: %f.2, Balance: %f.2 Created At: %v ]", trx.Id, trx.AccountId, trx.OperationId, trx.Amount, trx.Balance, trx.CreatedAt)
 }

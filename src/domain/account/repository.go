@@ -36,7 +36,8 @@ func (rep *AccountRepository) Get(ctx context.Context, id int) (Account, error) 
 	cond := fmt.Sprintf("WHERE id = %d", id)
 	conditions := []string{cond}
 
-	_, err := rep.db.GetOne(ctx, table, columns, conditions, &acc)
+	row := rep.db.GetOne(ctx, table, columns, conditions)
+	err := row.Scan(&acc.Id, &acc.Document)
 	if err != nil {
 		return acc, err
 	}
