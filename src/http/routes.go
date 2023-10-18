@@ -1,41 +1,44 @@
 package http
 
 import (
-	"net/http"
 	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
+	"payments-api/internal/database"
 	"payments-api/src/app/handlers"
+	"payments-api/src/domain/account"
+	"payments-api/src/domain/transaction"
 )
 
-func NewRouter() *chi.Mux {
+func NewRouter(accRep *account.AccountRepository, trxRep *transaction.TransactionRepository, utils *database.Utils) *chi.Mux {
 	// Basic router
 	router := chi.NewRouter()
 
 	// go-chi useful middlewares
+	router.Use(middleware.Logger)
+	router.Use(middleware.AllowContentType("application/json"))
 	router.Use(middleware.RequestID)
 	router.Use(middleware.RealIP)
-	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
-	router.Use(middleware.Timeout(30 * time.Second))
+	router.Use(middleware.Timeout(5 * time.Second))
 	router.Use(appHeadersMiddleware)
 
 	// Routes: healthcheck
-	router.Get("/health", handlers.HealthCheck)
+	router.Get("/health", handlers.HealthCheck(utils))
 	// Routes: Accounts
 	router.Route("/accounts", func(r chi.Router) {
-		r.Post("/", handlers.CreateAccount)
-		r.Get("/{accountId}", handlers.GetAccount)
+		r.Post("/", handlers.CreateAccount(accRep))
+		r.Get("/{accountId}", handlers.GetAccount(accRep))
 	})
 	// Routes: Transactions
-	router.Post("/transactions", handlers.CreateTransaction)
+	router.Post("/transactions", handlers.CreateTransaction(trxRep))
+
+	// 404
+	router.NotFound(handlers.NotFound)
+	// 405
+	router.MethodNotAllowed(handlers.MethodNotAllowed)
 
 	return router
-}
-
-// getURLParam is used to read a value from the URL, as a string.
-func getURLParam(r *http.Request, v string) string {
-	return chi.URLParam(r, v)
 }

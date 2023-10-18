@@ -1,30 +1,30 @@
 package transaction
-/*
+
 import (
+	"context"
+
 	"payments-api/internal/database"
 )
 
-type TransactionsRepository struct {
-	db *database.Database
+const table = "transactions"
+
+type TransactionRepository struct {
+	db database.Adapter
 }
 
-func NewRepository(dbC *database.Database) *TransactionsRepository {
-	return &TransactionsRepository{
-		db: dbC,
+func NewRepository(adapter database.Adapter) *TransactionRepository {
+	return &TransactionRepository{
+		db: adapter,
 	}
 }
 
-func (t *TransactionsRepository) Create(aId int, oId int, a float32) error {
-	st, err := t.db.Conn.Prepare("INSERT INTO transactions(account_id, operation_id, amount) VALUES( $1, $2, $3)")
+func (rep *TransactionRepository) Create(ctx context.Context, aId int, oId Operation, a float32) error {
+	columns := []string{"account_id", "operation_id", "amount"}
+
+	err := rep.db.Insert(ctx, table, columns, aId, oId, a)
 	if err != nil {
-		return err
-	}
-	defer st.Close()
-
-	if _, err := st.Exec(aId, oId, a); err != nil {
 		return err
 	}
 
 	return nil
 }
-*/

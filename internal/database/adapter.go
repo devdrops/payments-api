@@ -5,7 +5,7 @@ import (
 )
 
 type Adapter interface {
-	Create(ctx context.Context, t string, args ...any) error
-	Read(ctx context.Context, t string, args ...any)
+	Insert(ctx context.Context, table string, columns []string, values ...any) error
+	GetOne(ctx context.Context, table string, columns []string, filters []string, ent Entity) (Entity, error)
 	Ping(ctx context.Context) (bool, error)
 }

@@ -8,16 +8,21 @@ import (
 	"payments-api/internal/database"
 )
 
-func HealthCheck(w http.ResponseWriter, r *http.Request) {
-	var ctx context.Context
-	ctx, cancel := context.WithTimeout(ctx, 1 * time.Second)
-	defer cancel()
+var (
+	Version   string
+	BuildDate string
+)
 
-	adapter := database.NewPostgresAdapter()
-	if err, _ := adapter.Ping(ctx); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+func HealthCheck(u *database.Utils) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+		defer cancel()
+
+		if ok, err := u.PingDatabase(ctx); err != nil || ok == false {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
 	}
-
-        w.WriteHeader(http.StatusOK)
 }

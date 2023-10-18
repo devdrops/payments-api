@@ -1,37 +1,42 @@
 package account
 
 import (
+	"context"
+	"fmt"
+
 	"payments-api/internal/database"
 )
 
+const table = "accounts"
+
 type AccountRepository struct {
-	db *database.Adapter
+	db database.Adapter
 }
 
-func NewRepository(adapter *database.Adapter) *AccountRepository {
+func NewRepository(adapter database.Adapter) *AccountRepository {
 	return &AccountRepository{
 		db: adapter,
 	}
 }
 
-func (a *AccountRepository) Create(doc string) error {
-	st, err := a.db.Conn.Prepare("INSERT INTO accounts(document) VALUES( $1)")
-	if err != nil {
-		return err
-	}
-	defer st.Close()
+func (rep *AccountRepository) Create(ctx context.Context, doc string) error {
+	columns := []string{"document"}
 
-	if _, err := st.Exec(doc); err != nil {
+	err := rep.db.Insert(ctx, table, columns, doc)
+	if err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (a *AccountRepository) Get(id int) (Account, error) {
-	var acc Account
-	err := a.db.Conn.QueryRow("SELECT id, document FROM accounts WHERE id = $1", id).
-		Scan(&acc.Id, &acc.Document)
+func (rep *AccountRepository) Get(ctx context.Context, id int) (Account, error) {
+	acc := Account{}
+	columns := []string{"id", "document"}
+	cond := fmt.Sprintf("WHERE id = %d", id)
+	conditions := []string{cond}
+
+	_, err := rep.db.GetOne(ctx, table, columns, conditions, &acc)
 	if err != nil {
 		return acc, err
 	}
