@@ -18,7 +18,7 @@ COPY . /app
 RUN go mod tidy \
 	&& CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /api \
     -ldflags="-X 'payments-api/src/app/handlers.Version=$COMMIT_HASH' -X 'payments-api/src/app/handlers.BuildDate=$BUILD_DATE'" \
-    ./app/cmd
+    ./cmd
 
 ##########
 # Project's deploy image.
