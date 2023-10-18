@@ -10,7 +10,7 @@ type Logger struct {
 }
 
 func NewLogger() *Logger {
-	l := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	l := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{AddSource: true}))
 
 	return &Logger{
 		logger: l,

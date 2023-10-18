@@ -7,12 +7,13 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 
 	"payments-api/internal/database"
+	"payments-api/internal/logger"
 	"payments-api/src/app/handlers"
 	"payments-api/src/domain/account"
 	"payments-api/src/domain/transaction"
 )
 
-func NewRouter(accRep *account.AccountRepository, trxRep *transaction.TransactionRepository, utils *database.Utils) *chi.Mux {
+func NewRouter(accRep *account.AccountRepository, trxRep *transaction.TransactionRepository, utils *database.Utils, log *logger.Logger) *chi.Mux {
 	// Basic router
 	router := chi.NewRouter()
 
@@ -26,14 +27,14 @@ func NewRouter(accRep *account.AccountRepository, trxRep *transaction.Transactio
 	router.Use(appHeadersMiddleware)
 
 	// Routes: healthcheck
-	router.Get("/health", handlers.HealthCheck(utils))
+	router.Get("/health", handlers.HealthCheck(utils, log))
 	// Routes: Accounts
 	router.Route("/accounts", func(r chi.Router) {
-		r.Post("/", handlers.CreateAccount(accRep))
-		r.Get("/{accountId}", handlers.GetAccount(accRep))
+		r.Post("/", handlers.CreateAccount(accRep, log))
+		r.Get("/{accountId}", handlers.GetAccount(accRep, log))
 	})
 	// Routes: Transactions
-	router.Post("/transactions", handlers.CreateTransaction(trxRep))
+	router.Post("/transactions", handlers.CreateTransaction(trxRep, log))
 
 	// 404
 	router.NotFound(handlers.NotFound)

@@ -3,22 +3,25 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"strconv"
 	"time"
 
+	"payments-api/internal/logger"
 	"payments-api/src/domain/account"
 
 	"github.com/go-chi/chi/v5"
 )
 
-func CreateAccount(repository *account.AccountRepository) http.HandlerFunc {
+func CreateAccount(repository *account.AccountRepository, log *logger.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var a account.Account
 
 		rb, err := io.ReadAll(r.Body)
 		if err != nil {
+			log.Error(err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -26,6 +29,7 @@ func CreateAccount(repository *account.AccountRepository) http.HandlerFunc {
 		json.Unmarshal(rb, &a)
 
 		if a.Valid() == false {
+			log.Error(errors.New("Invalid input"))
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -33,6 +37,7 @@ func CreateAccount(repository *account.AccountRepository) http.HandlerFunc {
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 		defer cancel()
 		if err := repository.Create(ctx, a.Document); err != nil {
+			log.Error(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -41,7 +46,7 @@ func CreateAccount(repository *account.AccountRepository) http.HandlerFunc {
 	}
 }
 
-func GetAccount(rep *account.AccountRepository) http.HandlerFunc {
+func GetAccount(rep *account.AccountRepository, log *logger.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var a account.Account
 
@@ -52,6 +57,7 @@ func GetAccount(rep *account.AccountRepository) http.HandlerFunc {
 		defer cancel()
 		acc, err := rep.Get(ctx, a.Id)
 		if err != nil {
+			log.Error(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}

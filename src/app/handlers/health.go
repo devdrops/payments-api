@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"payments-api/internal/database"
+	"payments-api/internal/logger"
 )
 
 var (
@@ -13,12 +14,14 @@ var (
 	BuildDate string
 )
 
-func HealthCheck(u *database.Utils) http.HandlerFunc {
+func HealthCheck(u *database.Utils, log *logger.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 		defer cancel()
 
-		if ok, err := u.PingDatabase(ctx); err != nil || ok == false {
+		_, err := u.PingDatabase(ctx)
+		if err != nil {
+			log.Error(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}

@@ -5,6 +5,7 @@ import (
 
 	"payments-api/internal/config"
 	"payments-api/internal/database"
+	"payments-api/internal/logger"
 	"payments-api/internal/database/postgres"
 	"payments-api/src/domain/account"
 	"payments-api/src/domain/transaction"
@@ -16,6 +17,7 @@ type App struct {
 	Acc *account.AccountRepository
 	Trx *transaction.TransactionRepository
 	Utl *database.Utils
+	Log *logger.Logger
 }
 
 func NewApp() *App {
@@ -27,10 +29,11 @@ func NewApp() *App {
 		Acc: account.NewRepository(db),
 		Trx: transaction.NewRepository(db),
 		Utl: database.NewUtils(db),
+		Log: logger.NewLogger(),
 	}
 }
 
 func (a *App) StartServer() {
-	router := apphttp.NewRouter(a.Acc, a.Trx, a.Utl)
+	router := apphttp.NewRouter(a.Acc, a.Trx, a.Utl, a.Log)
 	http.ListenAndServe(a.Cfg.Port, router)
 }
